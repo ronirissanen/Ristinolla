@@ -1,31 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
-public class InteractiveTile : MonoBehaviour
+public class InteractiveTile : NetworkBehaviour
 {
-    private Coordinate coords;
-    private TILEVALUE tileValue;
+    private NetworkVariable<Coordinate> coords = new NetworkVariable<Coordinate>();
     [SerializeField] private TextMeshPro symbol;
 
-    public void InitTile(int _x, int _y)
+    public void SetCoords(int _x, int _y)
     {
-        coords.x = _x;
-        coords.y = _y;
+        coords = new NetworkVariable<Coordinate>(new Coordinate(_x, _y));
     }
 
-    public (Coordinate, TILEVALUE) TileWasClicked(TILEVALUE _value)
+    public Coordinate GetCoords()
     {
-        if (tileValue != TILEVALUE.NONE)
-        {
-            Debug.Log("Tile already has a value.");
-            return (coords, TILEVALUE.NONE);
-        }
+        return coords.Value;
+    }
 
-        tileValue = _value;
-
-        switch (tileValue)
+    public void DrawSymbol(TILEVALUE _value)
+    {
+        switch (_value)
         {
             case TILEVALUE.O:
                 symbol.text = "O";
@@ -40,7 +37,6 @@ public class InteractiveTile : MonoBehaviour
 
                 break;
         }
-        return (coords, tileValue);
     }
 }
 

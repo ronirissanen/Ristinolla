@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GridManager : MonoBehaviour
+public class GridManager : NetworkBehaviour
 {
     private Dictionary<Coordinate, TILEVALUE> GameState = new Dictionary<Coordinate, TILEVALUE>();
     [SerializeField] private int gridSize = 49;
     [SerializeField] private GameObject tilePrefab;
-    [SerializeField] private ClickManager clickPrefab;
+    [SerializeField] private PlayerClick clickPrefab;
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        if (!IsServer)
+            return;
         GenerateGrid();
-        //SpawnPlayerClick();
     }
 
     private void GenerateGrid()
@@ -23,28 +25,35 @@ public class GridManager : MonoBehaviour
             {
 
                 GameObject newTile = Instantiate(tilePrefab, new Vector3(this.transform.position.x + x, this.transform.position.y + y, 0), Quaternion.identity);
+                newTile.GetComponent<NetworkObject>().Spawn();
                 newTile.name = "[" + x + "|" + y + "]";
-                newTile.GetComponentInChildren<InteractiveTile>().InitTile(x, y);
-                newTile.transform.SetParent(this.transform);
+                newTile.GetComponentInChildren<InteractiveTile>().SetCoords(x, y);
+                //newTile.transform.SetParent(this.transform);
                 GameState.Add(new Coordinate(x, y), TILEVALUE.NONE);
             }
         }
     }
 
-    private void SpawnPlayerClick()
+    [ServerRpc]
+    private void UpdateTileServerRpc(Coordinate _coords, TILEVALUE _value)
     {
-        ClickManager click = Instantiate(clickPrefab, this.transform);
-        click.SetGridManager(this);
-    }
-
-    public void UpdateTile(Coordinate _coord, TILEVALUE _value)
-    {
-        GameState[_coord] = _value;
-        if (VictoryCheck(_coord, _value))
+        GameState[_coords] = _value;
+        if (VictoryCheck(_coords, _value))
         {
             Debug.Log(_value.ToString() + " WINS!");
-            //gamemanager.endgame();
+            //end game client rpc;
         }
+        Debug.Log("Tile updated in dictionary.");
+    }
+
+
+    public bool TryUpdateTile(Coordinate _coords, TILEVALUE _value)
+    {
+        if (GameState[_coords] != TILEVALUE.NONE)
+            return false;
+
+        UpdateTileServerRpc(_coords, _value);
+        return true;
     }
 
     public bool VictoryCheck(Coordinate _coord, TILEVALUE _value)
