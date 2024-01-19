@@ -7,9 +7,9 @@ public class ClickManager : MonoBehaviour
     TILEVALUE whoseTurn = TILEVALUE.X;
     private GridManager grid;
 
-    private void Start()
+    public void SetGridManager(GridManager _gm)
     {
-        grid = GetComponent<GridManager>();
+        grid = _gm;
     }
 
     void Update()

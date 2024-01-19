@@ -159,7 +159,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.6509804, g: 0.6745098, b: 0.70980394, a: 0}
+  m_BackGroundColor: {r: 0.58401567, g: 0.60701317, b: 0.6415094, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -301,7 +301,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1432320958}
   - component: {fileID: 1432320959}
-  - component: {fileID: 1432320960}
   m_Layer: 0
   m_Name: GM
   m_TagString: Untagged
@@ -339,15 +338,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: 49
   tilePrefab: {fileID: 1715251815262472743, guid: abaf10dfd312ddb4da179054af03162d, type: 3}
---- !u!114 &1432320960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1432320957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7eda9753fe3bf134580979a32c3afcb8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  clickPrefab: {fileID: 8835409855915319376, guid: 96ea7aa1d8fbd594bad920b3252f6886, type: 3}
