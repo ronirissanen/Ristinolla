@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClickManager : MonoBehaviour
+public class PlayerClick : MonoBehaviour
 {
     TILEVALUE whoseTurn = TILEVALUE.X;
     private GridManager grid;

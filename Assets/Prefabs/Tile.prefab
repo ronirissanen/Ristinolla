@@ -147,7 +147,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a5659c47f7fbc54caad781b3cc60604, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileValue: 0
   symbol: {fileID: 1715251815952583863}
 --- !u!1 &1715251815262472743
 GameObject:
@@ -291,7 +290,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4280229663
-  m_fontColor: {r: 0.65080994, g: 0.67107326, b: 0.7075472, a: 1}
+  m_fontColor: {r: 0.7871129, g: 0.8024971, b: 0.8301887, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
