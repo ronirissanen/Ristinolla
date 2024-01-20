@@ -21,7 +21,7 @@ public class NetworkManagerUI : MonoBehaviour
         });
         startButton.onClick.AddListener(() =>
         {
-            FindObjectOfType<GridManager>().GenerateGrid();
+            FindObjectOfType<GridManager>().GenerateGridServerRpc();
         });
     }
 }

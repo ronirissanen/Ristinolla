@@ -5,43 +5,56 @@ using UnityEngine;
 
 public class PlayerClick : NetworkBehaviour
 {
-    TILEVALUE playerFaction;
-    public ulong turnId = 1;
-    private GridManager grid;
+    public NetworkVariable<TILEVALUE> playerFaction = new NetworkVariable<TILEVALUE>(TILEVALUE.NONE);
 
-    public void SetGrid(GridManager _grid)
+    public override void OnNetworkSpawn()
     {
-        grid = _grid;
+        base.OnNetworkSpawn();
+        SetFaction();
+    }
+    private void SetFaction()
+    {
+        if (OwnerClientId == 0)
+        {
+            playerFaction.Value = TILEVALUE.O;
+        }
+        if (OwnerClientId == 1)
+        {
+            playerFaction.Value = TILEVALUE.X;
+        }
     }
 
     void Update()
     {
         if (!IsOwner)
             return;
-        if (turnId != OwnerClientId)
+        if (TurnHandler.Instance.GetTurn() != OwnerClientId)
             return;
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(Input.mousePosition));
+            ClickServerRpc(playerFaction.Value, Input.mousePosition);
+            Debug.Log("Faction on client: " + playerFaction.Value);
+        }
+    }
 
-            if (rayHit.collider == null)
-                return;
+    [ServerRpc(RequireOwnership = false)]
+    private void ClickServerRpc(TILEVALUE _faction, Vector3 _mousePos)
+    {
+        Debug.Log("Faction on server: " + _faction);
+        RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(_mousePos));
 
-            if (rayHit.collider.gameObject.TryGetComponent<InteractiveTile>(out InteractiveTile tile))
+        if (rayHit.collider == null)
+            return;
+
+        if (rayHit.collider.gameObject.TryGetComponent<InteractiveTile>(out InteractiveTile tile))
+        {
+            Coordinate coords = tile.GetCoords();
+            if (GridManager.Instance.TryUpdateTile(coords, _faction))
             {
-                Coordinate coords = tile.GetCoords();
-                if (grid.TryUpdateTile(coords, playerFaction))
-                {
-                    tile.SetValueClientRpc(playerFaction);
-                    EndTurnClientRpc();
-                }
+                tile.SetValueServerRpc(_faction);
+                TurnHandler.Instance.EndTurn();
             }
         }
     }
 
-    [ClientRpc]
-    private void EndTurnClientRpc()
-    {
-        turnId = turnId == 0 ? 1 : (ulong)0;
-    }
 }
