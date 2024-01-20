@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class PlayerClick : MonoBehaviour
+public class PlayerClick : NetworkBehaviour
 {
-    TILEVALUE whoseTurn = TILEVALUE.X;
+    TILEVALUE playerFaction;
+    private ulong turnId = 1;
     private GridManager grid;
 
     private void Start()
@@ -14,26 +17,31 @@ public class PlayerClick : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner)
+            return;
+        if (turnId != OwnerClientId)
+            return;
         if (Input.GetMouseButtonDown(0))
         {
-
             RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(Input.mousePosition));
+
+            if (rayHit.collider == null)
+                return;
 
             if (rayHit.collider.gameObject.TryGetComponent<InteractiveTile>(out InteractiveTile tile))
             {
-                (Coordinate, TILEVALUE) item = tile.TileWasClicked(whoseTurn);
-                if (item.Item2 != TILEVALUE.NONE)
+                Coordinate coords = tile.GetCoords();
+                if (grid.TryUpdateTile(coords, playerFaction))
                 {
-                    grid.UpdateTile(item.Item1, item.Item2);
-                    whoseTurn = TurnOver();
+                    tile.SetValue(playerFaction);
+                    EndTurn();
                 }
             }
         }
     }
 
-    private TILEVALUE TurnOver()
+    private void EndTurn()
     {
-        return whoseTurn == TILEVALUE.X ? TILEVALUE.O : TILEVALUE.X;
+        turnId = turnId == 0 ? 1 : (ulong)0;
     }
-
 }

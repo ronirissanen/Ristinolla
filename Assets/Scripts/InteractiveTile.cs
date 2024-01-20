@@ -6,26 +6,22 @@ using UnityEngine;
 public class InteractiveTile : MonoBehaviour
 {
     private Coordinate coords;
-    private TILEVALUE tileValue;
     [SerializeField] private TextMeshPro symbol;
 
-    public void InitTile(int _x, int _y)
+    public void SetCoords(int _x, int _y)
     {
         coords.x = _x;
         coords.y = _y;
     }
 
-    public (Coordinate, TILEVALUE) TileWasClicked(TILEVALUE _value)
+    public Coordinate GetCoords()
     {
-        if (tileValue != TILEVALUE.NONE)
-        {
-            Debug.Log("Tile already has a value.");
-            return (coords, TILEVALUE.NONE);
-        }
+        return coords;
+    }
 
-        tileValue = _value;
-
-        switch (tileValue)
+    public void SetValue(TILEVALUE _value)
+    {
+        switch (_value)
         {
             case TILEVALUE.O:
                 symbol.text = "O";
@@ -40,7 +36,6 @@ public class InteractiveTile : MonoBehaviour
 
                 break;
         }
-        return (coords, tileValue);
     }
 }
 

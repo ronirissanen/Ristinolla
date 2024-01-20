@@ -1,19 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class GridManager : MonoBehaviour
+public class GridManager : NetworkBehaviour
 {
     private Dictionary<Coordinate, TILEVALUE> GameState = new Dictionary<Coordinate, TILEVALUE>();
     [SerializeField] private int gridSize = 49;
     [SerializeField] private GameObject tilePrefab;
 
-    void Start()
-    {
-        GenerateGrid();
-    }
-
-    private void GenerateGrid()
+    public void GenerateGrid()
     {
         for (int x = 0; x < gridSize; x++)
         {
@@ -22,16 +19,30 @@ public class GridManager : MonoBehaviour
 
                 GameObject newTile = Instantiate(tilePrefab, new Vector3(this.transform.position.x + x, this.transform.position.y + y, 0), Quaternion.identity);
                 newTile.name = "[" + x + "|" + y + "]";
-                newTile.GetComponentInChildren<InteractiveTile>().InitTile(x, y);
+                newTile.GetComponent<NetworkObject>().Spawn();
+                newTile.GetComponentInChildren<InteractiveTile>().SetCoords(x, y);
                 GameState.Add(new Coordinate(x, y), TILEVALUE.NONE);
             }
         }
     }
 
-    public void UpdateTile(Coordinate _coord, TILEVALUE _value)
+    public bool TryUpdateTile(Coordinate _coords, TILEVALUE _value)
     {
-        GameState[_coord] = _value;
-        if (VictoryCheck(_coord, _value))
+        if (GameState[_coords] == TILEVALUE.NONE)
+        {
+            UpdateTile(_coords, _value);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void UpdateTile(Coordinate _coords, TILEVALUE _value)
+    {
+        GameState[_coords] = _value;
+        if (VictoryCheck(_coords, _value))
         {
             Debug.Log(_value.ToString() + " WINS!");
             //gamemanager.endgame();
