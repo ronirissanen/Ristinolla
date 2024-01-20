@@ -2,13 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class GridManager : NetworkBehaviour
 {
     private Dictionary<Coordinate, TILEVALUE> GameState = new Dictionary<Coordinate, TILEVALUE>();
     [SerializeField] private int gridSize = 49;
     [SerializeField] private GameObject tilePrefab;
+
+    private void Start()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+    }
+
+    private void OnClientConnected(ulong _id)
+    {
+        NetworkManager.Singleton.ConnectedClients[_id].PlayerObject.GetComponent<PlayerClick>().SetGrid(this);
+    }
 
     public void GenerateGrid()
     {
@@ -30,7 +39,7 @@ public class GridManager : NetworkBehaviour
     {
         if (GameState[_coords] == TILEVALUE.NONE)
         {
-            UpdateTile(_coords, _value);
+            UpdateTileClientRpc(_coords, _value);
             return true;
         }
         else
@@ -39,7 +48,8 @@ public class GridManager : NetworkBehaviour
         }
     }
 
-    public void UpdateTile(Coordinate _coords, TILEVALUE _value)
+    [ClientRpc]
+    public void UpdateTileClientRpc(Coordinate _coords, TILEVALUE _value)
     {
         GameState[_coords] = _value;
         if (VictoryCheck(_coords, _value))

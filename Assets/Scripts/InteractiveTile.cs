@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public class InteractiveTile : MonoBehaviour
@@ -19,7 +20,8 @@ public class InteractiveTile : MonoBehaviour
         return coords;
     }
 
-    public void SetValue(TILEVALUE _value)
+    [ClientRpc]
+    public void SetValueClientRpc(TILEVALUE _value)
     {
         switch (_value)
         {

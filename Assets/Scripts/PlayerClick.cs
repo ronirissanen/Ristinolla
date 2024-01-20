@@ -2,17 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class PlayerClick : NetworkBehaviour
 {
     TILEVALUE playerFaction;
-    private ulong turnId = 1;
+    public ulong turnId = 1;
     private GridManager grid;
 
-    private void Start()
+    public void SetGrid(GridManager _grid)
     {
-        grid = GetComponent<GridManager>();
+        grid = _grid;
     }
 
     void Update()
@@ -33,14 +32,15 @@ public class PlayerClick : NetworkBehaviour
                 Coordinate coords = tile.GetCoords();
                 if (grid.TryUpdateTile(coords, playerFaction))
                 {
-                    tile.SetValue(playerFaction);
-                    EndTurn();
+                    tile.SetValueClientRpc(playerFaction);
+                    EndTurnClientRpc();
                 }
             }
         }
     }
 
-    private void EndTurn()
+    [ClientRpc]
+    private void EndTurnClientRpc()
     {
         turnId = turnId == 0 ? 1 : (ulong)0;
     }
