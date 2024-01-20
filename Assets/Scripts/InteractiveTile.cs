@@ -20,7 +20,8 @@ public class InteractiveTile : NetworkBehaviour
         return coords.Value;
     }
 
-    public void DrawSymbol(TILEVALUE _value)
+    [ClientRpc]
+    public void DrawSymbolClientRpc(TILEVALUE _value)
     {
         switch (_value)
         {
@@ -37,6 +38,13 @@ public class InteractiveTile : NetworkBehaviour
 
                 break;
         }
+        DrawSymbolServerRpc(symbol.text);
+    }
+
+    [ServerRpc]
+    public void DrawSymbolServerRpc(string _text)
+    {
+        symbol.text = _text;
     }
 }
 

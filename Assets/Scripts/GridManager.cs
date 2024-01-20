@@ -10,14 +10,9 @@ public class GridManager : NetworkBehaviour
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private PlayerClick clickPrefab;
 
-    public override void OnNetworkSpawn()
-    {
-        if (!IsServer)
-            return;
-        GenerateGrid();
-    }
 
-    private void GenerateGrid()
+    [ClientRpc]
+    public void GenerateGridClientRpc()
     {
         for (int x = 0; x < gridSize; x++)
         {
@@ -34,10 +29,20 @@ public class GridManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
+    public bool TryUpdateTile(Coordinate _coords, TILEVALUE _value)
+    {
+        if (GameState[_coords] != TILEVALUE.NONE)
+            return false;
+
+        UpdateTileServerRpc(_coords, _value);
+        return true;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
     private void UpdateTileServerRpc(Coordinate _coords, TILEVALUE _value)
     {
         GameState[_coords] = _value;
+        UpdateTileClientRpc(_coords, _value);
         if (VictoryCheck(_coords, _value))
         {
             Debug.Log(_value.ToString() + " WINS!");
@@ -46,14 +51,10 @@ public class GridManager : NetworkBehaviour
         Debug.Log("Tile updated in dictionary.");
     }
 
-
-    public bool TryUpdateTile(Coordinate _coords, TILEVALUE _value)
+    [ClientRpc]
+    private void UpdateTileClientRpc(Coordinate _coords, TILEVALUE _value)
     {
-        if (GameState[_coords] != TILEVALUE.NONE)
-            return false;
-
-        UpdateTileServerRpc(_coords, _value);
-        return true;
+        GameState[_coords] = _value;
     }
 
     public bool VictoryCheck(Coordinate _coord, TILEVALUE _value)
