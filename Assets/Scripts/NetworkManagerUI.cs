@@ -21,7 +21,7 @@ public class NetworkManagerUI : MonoBehaviour
         });
         startButton.onClick.AddListener(() =>
         {
-            FindObjectOfType<GridManager>().GenerateGridServerRpc();
+            GameHandler.Instance.StartGame();
         });
     }
 }

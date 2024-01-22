@@ -33,14 +33,14 @@ public class PlayerClick : NetworkBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             ClickServerRpc(playerFaction.Value, Input.mousePosition);
-            Debug.Log("Faction on client: " + playerFaction.Value);
+            //Debug.Log("Faction on client: " + playerFaction.Value);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void ClickServerRpc(TILEVALUE _faction, Vector3 _mousePos)
     {
-        Debug.Log("Faction on server: " + _faction);
+        //Debug.Log("Faction on server: " + _faction);
         RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(_mousePos));
 
         if (rayHit.collider == null)
@@ -52,6 +52,7 @@ public class PlayerClick : NetworkBehaviour
             if (GridManager.Instance.TryUpdateTile(coords, _faction))
             {
                 tile.SetValueServerRpc(_faction);
+                GridManager.Instance.VictoryCheckServerRpc(coords, _faction);
                 TurnHandler.Instance.EndTurn();
             }
         }

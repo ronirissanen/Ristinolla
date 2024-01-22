@@ -32,19 +32,7 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
                 Debug.Log("Spawned tile.");
             }
         }
-        /*
-        foreach (var item in GameState)
-        {
-            AddTileClientRpc(item.Key, item.Value);
-        }
-        */
         isGenerated.Value = true;
-    }
-
-    [ClientRpc]
-    private void AddTileClientRpc(Coordinate _key, TILEVALUE _value)
-    {
-        GameState.Add(_key, _value);
     }
 
     public bool TryUpdateTile(Coordinate _coords, TILEVALUE _value)
@@ -60,30 +48,50 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
         }
     }
 
-    [ServerRpc]
-    public void UpdateTileServerRpc(Coordinate _coords, TILEVALUE _value)
-    {
-        Debug.Log(_value + " placed at " + "(" + _coords.x + "|" + _coords.y + ")");
-        GameState[_coords] = _value;
-        UpdateTileClientRpc(_coords, _value);
-        /*
-        if (VictoryCheck(_coords, _value))
-        {
-            Debug.Log(_value.ToString() + " WINS!");
-            //gamemanager.endgame();
-        }
-        */
-    }
-
     [ClientRpc]
     private void UpdateTileClientRpc(Coordinate _coords, TILEVALUE _value)
     {
         GameState[_coords] = _value;
     }
 
-    public bool VictoryCheck(Coordinate _coord, TILEVALUE _value)
+    [ServerRpc]
+    public void UpdateTileServerRpc(Coordinate _coords, TILEVALUE _value)
     {
+        Debug.Log(_value + " placed at " + "(" + _coords.x + "|" + _coords.y + ")");
+        GameState[_coords] = _value;
+        UpdateTileClientRpc(_coords, _value);
+    }
+
+    [ServerRpc]
+    public void VictoryCheckServerRpc(Coordinate _coords, TILEVALUE _value)
+    {
+        if (VictoryCheck(_coords, _value))
+        {
+            Debug.Log(_value.ToString() + " WINS!");
+
+            EndGame();
+        }
+    }
+
+    private void EndGame()
+    {
+        foreach (var tile in FindObjectsOfType<InteractiveTile>())
+        {
+            Coordinate coords = tile.GetCoords();
+
+            GameState[coords] = TILEVALUE.NONE;
+            UpdateTileClientRpc(coords, TILEVALUE.NONE);
+            tile.SetValueServerRpc(TILEVALUE.NONE);
+        }
+    }
+
+    private bool VictoryCheck(Coordinate _coord, TILEVALUE _value)
+    {
+        if (_value == TILEVALUE.NONE)
+            return false;
+
         int score = 0;
+
         //horizontal loop
         for (int x = -4; x <= 4; x++)
         {
