@@ -8,9 +8,12 @@ using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class RelayHandler : SingletonNetworkBehaviour<RelayHandler>
 {
+    [HideInInspector] public UnityEvent hostReady = new UnityEvent();
+    private string joinCode;
     private async void Start()
     {
         await UnityServices.InitializeAsync();
@@ -28,14 +31,13 @@ public class RelayHandler : SingletonNetworkBehaviour<RelayHandler>
         {
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(1);
 
-            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             Debug.Log("The join code is: " + joinCode);
 
             RelayServerData serverData = new RelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(serverData);
-
-            GUIUtility.systemCopyBuffer = joinCode; // copy to clipboard
+            hostReady.Invoke();
         }
         catch (RelayServiceException e)
         {
@@ -57,5 +59,10 @@ public class RelayHandler : SingletonNetworkBehaviour<RelayHandler>
         {
             Debug.Log(e);
         }
+    }
+
+    public string GetCode()
+    {
+        return joinCode;
     }
 }
