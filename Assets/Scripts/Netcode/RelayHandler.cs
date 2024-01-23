@@ -29,7 +29,7 @@ public class RelayHandler : SingletonNetworkBehaviour<RelayHandler>
     {
         try
         {
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(1);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(2);
 
             joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
@@ -54,6 +54,7 @@ public class RelayHandler : SingletonNetworkBehaviour<RelayHandler>
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(_joinCode);
             RelayServerData serverData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(serverData);
+            NetworkManager.Singleton.StartClient();
         }
         catch (RelayServiceException e)
         {
