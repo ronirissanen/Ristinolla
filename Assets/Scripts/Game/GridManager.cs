@@ -17,6 +17,8 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
         if (isGenerated.Value)
         {
             Debug.Log("Tried to generate the grid more than once.");
+            Debug.Log("Resetting grid...");
+            ResetGame();
             return;
         }
         for (int x = 0; x < gridSize; x++)
@@ -69,11 +71,11 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
         {
             Debug.Log(_value.ToString() + " WINS!");
 
-            EndGame();
+            ResetGame();
         }
     }
 
-    private void EndGame()
+    private void ResetGame()
     {
         foreach (var tile in FindObjectsOfType<InteractiveTile>())
         {
@@ -83,6 +85,7 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
             UpdateTileClientRpc(coords, TILEVALUE.NONE);
             tile.SetValueServerRpc(TILEVALUE.NONE);
         }
+        Debug.Log("Grid reset.");
     }
 
     private bool VictoryCheck(Coordinate _coord, TILEVALUE _value)

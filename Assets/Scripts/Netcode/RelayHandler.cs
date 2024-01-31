@@ -37,6 +37,7 @@ public class RelayHandler : SingletonNetworkBehaviour<RelayHandler>
 
             RelayServerData serverData = new RelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(serverData);
+            NetworkManager.Singleton.StartHost(); // tää kannattaa tehä btw :D
             hostReady.Invoke();
         }
         catch (RelayServiceException e)
@@ -60,6 +61,11 @@ public class RelayHandler : SingletonNetworkBehaviour<RelayHandler>
         {
             Debug.Log(e);
         }
+    }
+
+    public void ShutdownRelay()
+    {
+        NetworkManager.Singleton.Shutdown();
     }
 
     public string GetCode()

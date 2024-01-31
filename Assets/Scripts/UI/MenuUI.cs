@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MenuUI : MonoBehaviour
 {
+    [SerializeField] private GameObject menu;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button joinButton;
     [SerializeField] private Button codeButton;
-    [SerializeField] private Button backButton;
+    [SerializeField] private Button returnButton;
     [SerializeField] private GameObject hostMenu;
     [SerializeField] private GameObject joinMenu;
     [SerializeField] private GameObject loadingScreen;
@@ -28,9 +30,10 @@ public class MenuUI : MonoBehaviour
         {
             SetVisible(false, true, true);
         });
-        backButton.onClick.AddListener(() =>
+        returnButton.onClick.AddListener(() =>
         {
             SetVisible(false, false, false);
+            RelayHandler.Instance.ShutdownRelay();
         });
         inputField.onSubmit.AddListener((value) =>
         {
@@ -49,7 +52,7 @@ public class MenuUI : MonoBehaviour
     {
         hostMenu.SetActive(_isHostMenuVisible);
         joinMenu.SetActive(_isJoinMenuVisible);
-        backButton.gameObject.SetActive(_isBackButtonVisible);
+        returnButton.gameObject.SetActive(_isBackButtonVisible);
         if (_isHostMenuVisible)
             CopyCode();
     }
@@ -72,6 +75,11 @@ public class MenuUI : MonoBehaviour
     private void SetLoadingScreenActive()
     {
         loadingScreen.SetActive(false);
+    }
+
+    public void SetMenuActive(bool _b)
+    {
+        menu.SetActive(_b);
     }
 
     private void Update()
