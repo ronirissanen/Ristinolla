@@ -6,7 +6,6 @@ using UnityEngine;
 public class PlayerClick : NetworkBehaviour
 {
     public NetworkVariable<TILEVALUE> playerFaction = new NetworkVariable<TILEVALUE>(TILEVALUE.NONE);
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -57,5 +56,4 @@ public class PlayerClick : NetworkBehaviour
             }
         }
     }
-
 }

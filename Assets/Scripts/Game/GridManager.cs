@@ -23,7 +23,6 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
         }
         for (int x = 0; x < gridSize; x++)
         {
-            Debug.Log("Value of x in loop: " + x);
             for (int y = 0; y < gridSize; y++)
             {
                 GameObject newTile = Instantiate(tilePrefab, new Vector3(this.transform.position.x + x, this.transform.position.y + y, 0), Quaternion.identity);
@@ -31,10 +30,15 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
                 newTile.GetComponent<NetworkObject>().Spawn();
                 GameState.Add(new Coordinate(x, y), TILEVALUE.NONE);
                 newTile.GetComponentInChildren<InteractiveTile>().SetCoords(x, y);
-                Debug.Log("Spawned tile.");
             }
         }
+        Debug.Log("Grid generated.");
         isGenerated.Value = true;
+    }
+
+    public void IsNotGenerated()
+    {
+        isGenerated.Value = false;
     }
 
     public bool TryUpdateTile(Coordinate _coords, TILEVALUE _value)
@@ -70,6 +74,8 @@ public class GridManager : SingletonNetworkBehaviour<GridManager>
         if (VictoryCheck(_coords, _value))
         {
             Debug.Log(_value.ToString() + " WINS!");
+
+            TurnHandler.Instance.Score(_value);
 
             ResetGame();
         }

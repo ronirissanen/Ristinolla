@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +18,7 @@ public class MenuUI : MonoBehaviour
     [SerializeField] private GameObject loadingScreen;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text loadingDots;
-
+    [SerializeField] private Animator fadeAnim;
     private void Awake()
     {
         hostButton.onClick.AddListener(() =>
@@ -42,7 +43,10 @@ public class MenuUI : MonoBehaviour
         });
         codeButton.onClick.AddListener(() =>
         {
+            fadeAnim.Play("Fade");
             CopyCode();
+            Debug.Log("Copied code to clipboard.");
+
         });
         RelayHandler.Instance.hostReady.AddListener(SetCodeText);
         RelayHandler.Instance.hostReady.AddListener(SetLoadingScreenActive);
@@ -80,6 +84,7 @@ public class MenuUI : MonoBehaviour
     public void SetMenuActive(bool _b)
     {
         menu.SetActive(_b);
+        SetVisible(false, false, false);
     }
 
     private void Update()

@@ -15,10 +15,20 @@ public class GameHandler : SingletonNetworkBehaviour<GameHandler>
         StartGameServerRpc();
     }
 
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        FindObjectOfType<MenuUI>().SetMenuActive(true);
+        RelayHandler.Instance.ShutdownRelay();
+        GridManager.Instance.IsNotGenerated();
+        if (!IsServer)
+            return;
+    }
+
     [ServerRpc(RequireOwnership = false)]
     private void StartGameServerRpc()
     {
-        FindObjectOfType<GridManager>().GenerateGridServerRpc();
+        GridManager.Instance.GenerateGridServerRpc();
         StartGameClientRpc();
     }
 
@@ -26,8 +36,7 @@ public class GameHandler : SingletonNetworkBehaviour<GameHandler>
     private void StartGameClientRpc()
     {
         FindObjectOfType<MenuUI>().SetMenuActive(false);
+        FindObjectOfType<ScoreBoard>().StartCountingScore();
     }
-
-
 
 }
